@@ -9,5 +9,6 @@ class Player(Entity):
 
     def move(self, dir):
         # Robust or nah?
+        # Oh god the bounds checking
         self.x += dir[0] * Player.SPEED
         self.y += dir[1] * Player.SPEED
