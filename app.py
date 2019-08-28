@@ -56,7 +56,7 @@ class App:
             
 
             # self.game_screen.blit(self.images['player'], (0, 0))
-            player.move(direction)
+            player.move(direction, self.game_screen)
             enemy.move(self.game_screen)
 
             self.game_screen.fill(COLOR_MAIN)

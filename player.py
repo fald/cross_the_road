@@ -7,8 +7,12 @@ class Player(Entity):
     def __init__(self, name, x, y, image, width, height):
         super().__init__(name, x, y, image, width, height)
 
-    def move(self, dir):
+    def move(self, dir, screen):
         # Robust or nah?
         # Oh god the bounds checking
-        self.x += dir[0] * Player.SPEED
-        self.y += dir[1] * Player.SPEED
+        # Super great; TODO: Fix this shit-show
+        s_w = screen.get_width()
+        if ((dir[0] > 0 and self.x < s_w - self.width) or (dir[0] < 0 and self.x > 0)):
+            self.x += dir[0] * Player.SPEED
+        if (self.y in range(-Player.SPEED, screen.get_height() - self.height)):
+            self.y += dir[1] * Player.SPEED
