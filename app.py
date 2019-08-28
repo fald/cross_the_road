@@ -4,6 +4,7 @@ from settings import *
 from player import Player
 from npc import NPC
 from entity import Entity
+from random import randint
 
 class App:
     def __init__(self):
@@ -13,10 +14,29 @@ class App:
         self.game_screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.fonts = [
+            pygame.font.SysFont("Wingdings", 77),
+            pygame.font.SysFont("Wingdings", 75)
+        ]
+        self.cur_wins = 0
 
         # self.images = self.load_images()
         pygame.display.set_caption(SCREEN_CAPTION)
         self.run_game()
+
+    def win_game(self, text):
+        self.cur_wins += 1
+        for t in text:
+            self.game_screen.blit(t, ((SCREEN_WIDTH - t.get_width()) / 2, (SCREEN_HEIGHT - t.get_height()) / 2))
+        pygame.display.update()
+        self.clock.tick(1)
+
+    def lose_game(self, text):
+        self.cur_wins = 0
+        for t in text:
+            self.game_screen.blit(t, ((SCREEN_WIDTH - t.get_width()) / 2, (SCREEN_HEIGHT - t.get_height()) / 2))
+        pygame.display.update()
+        self.clock.tick(1)
 
     # Unused.
     def load_images(self):
@@ -31,13 +51,25 @@ class App:
     def load_entities(self):
         pass
 
+    def render_text(self, text, antialias=True):
+        t1 = self.fonts[0].render(text, antialias, COLOR_BLACK)
+        t2 = self.fonts[1].render(text, antialias, COLOR_WHITE)
+        return t1, t2
+
     def run_game(self):
         player = Player("Player", 20, SCREEN_HEIGHT / 2 - 25, "./assets/player.png", 50, 50)
         direction = (0, 0)
 
-        enemy = NPC("Squiggles", 200, 0, "./assets/enemy.png", 50, 50)
-        enemies = [enemy]
-
+        max_mob_speed = self.cur_wins ** 2 + 10
+        num_enemies = int(1 + self.cur_wins / 5) + 3
+        enemies = []
+        for i in range(num_enemies):
+            # first_x = 20 * 2 + 50
+            # last_x = SCREEN_WIDTH - first_x - 50
+            x_pos = int(((SCREEN_WIDTH - 20 * 2 - 50 * 2) / (num_enemies + 1)) * (i + 1))
+            y_pos = randint(20, SCREEN_HEIGHT - 20 - 50)
+            mob_speed = randint(10 + self.cur_wins, max_mob_speed)
+            enemies.append(NPC("Squiggles"+str(i), x_pos, y_pos, "./assets/enemy.png", 50, 50, start_speed=mob_speed))
         treasure = Entity("Treasure", SCREEN_WIDTH - 20 - 50, SCREEN_HEIGHT / 2 - 25, "./assets/treasure.png", 50, 50)
 
         while self.running:
@@ -61,15 +93,18 @@ class App:
 
             # self.game_screen.blit(self.images['player'], (0, 0))
             player.move(direction, self.game_screen)
-            enemy.move(self.game_screen)
+            for mob in enemies:
+                mob.move(self.game_screen)
 
             for mob in enemies:
                 if player.collide(mob):
-                    # Lose.
-                    print("Loser")
+                    text = self.render_text("You suck.")
+                    self.lose_game(text)
+                    self.run_game()
             if player.collide(treasure):
-                # Win
-                print("Winner")
+                text = self.render_text("There is only harshness ahead.")
+                self.win_game(text)
+                self.run_game()
 
             self.game_screen.fill(COLOR_MAIN)
             player.draw(self.game_screen)
