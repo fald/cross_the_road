@@ -15,10 +15,12 @@ class App:
         self.clock = pygame.time.Clock()
         self.running = True
         self.fonts = [
-            pygame.font.SysFont("Wingdings", 77),
-            pygame.font.SysFont("Wingdings", 75)
+            pygame.font.SysFont("Comic Sans", 79),
+            pygame.font.SysFont("Comic Sans", 75)
         ]
         self.cur_wins = 0
+        self.background = pygame.transform.scale(
+            pygame.transform.rotate(pygame.image.load("./assets/background.png"), 270), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # self.images = self.load_images()
         pygame.display.set_caption(SCREEN_CAPTION)
@@ -61,7 +63,7 @@ class App:
         direction = (0, 0)
 
         max_mob_speed = self.cur_wins ** 2 + 10
-        num_enemies = int(1 + self.cur_wins / 5) + 3
+        num_enemies = int(1 + self.cur_wins / 5)
         enemies = []
         for i in range(num_enemies):
             # first_x = 20 * 2 + 50
@@ -106,7 +108,8 @@ class App:
                 self.win_game(text)
                 self.run_game()
 
-            self.game_screen.fill(COLOR_MAIN)
+            # self.game_screen.fill(COLOR_MAIN)
+            self.game_screen.blit(self.background, (0, 0))
             player.draw(self.game_screen)
             # Is this significantly less efficient than having the one loop handle collision + drawing?
             # I guess in complex stuff its not even feasible to do together, but doesn't that increase inefficiency? Pah.
