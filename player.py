@@ -16,3 +16,13 @@ class Player(Entity):
             self.x += dir[0] * Player.SPEED
         if (self.y in range(-Player.SPEED, screen.get_height() - self.height)):
             self.y += dir[1] * Player.SPEED
+
+    def collide(self, other):
+        if (
+            self.x < other.x + other.width and
+            self.x + self.width > other.x and
+            self.y < other.y + other.height and
+            self.y + self.height > other.y
+        ):
+            return True
+        return False

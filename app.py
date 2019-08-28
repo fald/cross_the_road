@@ -3,6 +3,7 @@ from pygame.locals import *
 from settings import *
 from player import Player
 from npc import NPC
+from entity import Entity
 
 class App:
     def __init__(self):
@@ -35,6 +36,9 @@ class App:
         direction = (0, 0)
 
         enemy = NPC("Squiggles", 200, 0, "./assets/enemy.png", 50, 50)
+        enemies = [enemy]
+
+        treasure = Entity("Treasure", SCREEN_WIDTH - 20 - 50, SCREEN_HEIGHT / 2 - 25, "./assets/treasure.png", 50, 50)
 
         while self.running:
             for event in pygame.event.get():
@@ -59,10 +63,21 @@ class App:
             player.move(direction, self.game_screen)
             enemy.move(self.game_screen)
 
+            for mob in enemies:
+                if player.collide(mob):
+                    # Lose.
+                    print("Loser")
+            if player.collide(treasure):
+                # Win
+                print("Winner")
+
             self.game_screen.fill(COLOR_MAIN)
-            # self.game_screen.blit(player.image, player.location)
             player.draw(self.game_screen)
-            enemy.draw(self.game_screen)
+            # Is this significantly less efficient than having the one loop handle collision + drawing?
+            # I guess in complex stuff its not even feasible to do together, but doesn't that increase inefficiency? Pah.
+            for mob in enemies:
+                mob.draw(self.game_screen)
+            treasure.draw(self.game_screen)
 
             pygame.display.update()
             self.clock.tick(FPS)
